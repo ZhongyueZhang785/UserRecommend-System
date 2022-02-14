@@ -1,0 +1,200 @@
+#UI web
+http://master-public-dns-name:16010/master-status
+http://ec2-34-236-157-145.compute-1.amazonaws.com:16010/master-status
+#check security group
+mater:16000,2181
+slave:16020
+
+#revise zookeeper in java
+#revise hosts
+C:\Windows\System32\drivers\etc\hosts
+
+#screen
+screen -S load
+
+#copy file from S3
+hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.columns=HBASE_ROW_KEY,data:interaction_score,data:reply_tweet_id_list,data:retweet_tweet_id_list -Dimporttsv.bulk.output=/hfiles contact s3://twitter-nens/full/contact_csv/
+hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.columns=HBASE_ROW_KEY,data:user_id,data:screen_name,data:description,data:hash_tag,data:reply_to_user_id_list,data:retweet_to_user_id_list -Dimporttsv.bulk.output=/hfiles2 user s3://twitter-nens/full/user_csv/
+
+data:create_time,data:tweet_id,data:user_id,data:reply_to_id,data:retweet_to_id,data:text,data:hash_tag
+hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.columns=HBASE_ROW_KEY,data:create_time,data:tweet_id,data:user_id,data:reply_to_id,data:retweet_to_id,data:text,data:hash_tag -Dimporttsv.bulk.output=/hfiles3 user s3://twitter-nens/full/tweet_csv/
+
+#create hbase
+hbase shell
+create 'contact', 'data', SPLITS=> ['08','16','25','33','42','50','58','67','75','83','92']
+create 'user', 'data', SPLITS=> ['16','33','50','67','83']
+create 'tweet', 'data', SPLITS=> ['16','33','50','67','83']
+create 'contact', 'data', SPLITS=> ['50']
+create 'user', 'data', SPLITS=> ['50']
+
+#upload files
+home/hadoop
+
+# Create a new directory in HDFS
+hadoop fs -mkdir /input
+
+# Put the dataset to HDFS
+hadoop fs -put contact.csv /input
+hadoop fs -put user.csv /input
+
+# To check if the file is successfully stored to HDFS, use the following command (or you may specify your own file path):
+hadoop fs -ls /input/contact.csv
+hadoop fs -ls /input/user.csv
+
+#load file from local
+#contact
+HBASE_ROW_KEY，data:user1_id,data:user2_id,data:interaction_score,data:reply_count,data:reply_tweet_id_list,data:retweet_count,data:retweet_tweet_id_list
+hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.columns=HBASE_ROW_KEY,data:user1_id,data:user2_id,data:interaction_score,data:reply_count,data:reply_tweet_id_list,data:retweet_count,data:retweet_tweet_id_list -Dimporttsv.bulk.output=/hfiles contact /input/contact.csv
+#user
+HBASE_ROW_KEY,data:user_id,data:screen_name,data:description,data:hash_tag,data:reply_to_user_id_list,data:retweet_to_user_id_list
+hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.columns=HBASE_ROW_KEY,data:user_id,data:screen_name,data:description,data:hash_tag,data:reply_to_user_id_list,data:retweet_to_user_id_list -Dimporttsv.bulk.output=/hfiles2 user /input/user.csv
+
+#No matter local file or S3 file
+hadoop fs -ls /hfiles
+hadoop fs -ls /hfiles2
+
+hadoop fs -chown -R hbase:hbase /hfiles
+hadoop fs -chown -R hbase:hbase /hfiles2
+
+hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles /hfiles contact
+hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles /hfiles2 user
+
+#check data
+scan 'contact', {'LIMIT' => 5}
+scan 'user', {'LIMIT' => 10}
+
+count 'tweet'
+count 'user'
+scan 'user', FILTER=>"ValueFilter(=,'binary:2209194145')"
+scan 'user', FILTER=>"ValueFilter(=,'binary:2545723336')"
+get 'user','6333275452'
+scan 'user', FILTER=>"ValueFilter(=,'binary:2279733733')"
+
+scan 'user',{COLUMNS => ['data:hash_tag']},
+scan 'tweet', FILTER=>"ValueFilter(=,'binary:512104951')"
+
+get 'tweet','15~452032188150976513'
+get 'tweet','26~447715179791675392'
+get 'tweet','30~452826601894711296'
+get 'tweet','3~454922822776004609'
+get 'contact','2362157932~9914253271'
+get 'user','4584613541'
+get 'user','780548034'
+get 'user','6293359961'
+get 'user','3373379722'
+get 'contact','4584613541~780548034‘
+
+#test case
+#the user only exist in retweet
+http://localhost:8080/twitter?user_id=2397512632&type=both&phrase=hello%20cc&hashtag=cmu
+
+
+#clean resource
+#delete hfiles
+hadoop fs -rm -r /hfiles
+hadoop fs -rm -r /hfiles2
+hadoop fs -rm -r /input/contact.csv
+hadoop fs -rm -r /input/user.csv
+
+
+#delete table
+disable 'contact'
+drop 'contact'
+
+disable 'user'
+drop 'user'
+
+#debug locally
+revise the internal zookeeper in hosts file
+
+#snapshot
+#https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-hbase-snapshot.html
+hbase snapshot create -n snapshotContact -t contact
+hbase snapshot export -snapshot snapshotContact -copy-to s3://hbase-snapshot-noeat/hbase-full/snapshotContact
+
+hbase snapshot create -n snapshotUser -t user
+hbase snapshot export -snapshot snapshotUser -copy-to s3://hbase-snapshot-noeat/hbase-full/snapshotUser
+
+delete_snapshot 'snapshotContact'
+delete_snapshot 'snapshotUser'
+
+sudo -u hbase hbase snapshot export \
+-D hbase.rootdir=s3://hbase-snapshot-noeat/hbase-full/ \
+-snapshot 'snapshotUser' \
+-copy-to hdfs://ec2-54-242-18-31.compute-1.amazonaws.com:8020/user/hbase \
+-mappers 2
+
+sudo -u hbase hbase snapshot export \
+-D hbase.rootdir=s3://hbase-snapshot-noeat/hbase-full/ \
+-snapshot 'snapshotContact6' \
+-copy-to hdfs://ec2-54-242-18-31.compute-1.amazonaws.com:8020/user/hbase \
+-mappers 2
+
+
+#information
+snapshot info -snapshot hbaseSnapshot1
+
+hbase shell
+disable 'user'
+restore_snapshot 'snapshotUser'
+enable 'user'
+
+disable 'contact'
+restore_snapshot 'snapshotContact'
+enable 'contact'
+
+
+echo 'disable tableName; \
+restore_snapshot snapshotName; \
+enable tableName' | hbase shell
+
+
+hadoop fs -ls /hfiles
+hadoop fs -chown -R hbase:hbase /hfiles
+hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles /hfiles tweet2
+
+yarn jar /home/hadoop/import_tsv.jar edu.cmu.cc.utils.YetAnotherImportTsv
+
+hadoop fs -put try2.tsv /input
+hadoop fs -ls /input/try2.tsv
+
+create 'tweet', 'data', SPLITS=> ['1', '2','3','4','5','6']
+scan 'tweet', {'LIMIT' => 5}
+disable 'tweet'
+drop 'tweet'
+yarn jar /home/hadoop/import_tsv.jar edu.cmu.cc.utils.Import
+
+  hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.separator=, -Dimporttsv.columns=HBASE_ROW_KEY,data:create_time,data:text,data:reply_to_id,data:retweet_to_id,data:user_id,data:tweet_id,data:hash_tag tweet2 /input/try2.csv
+  hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.columns=HBASE_ROW_KEY,data:create_time,data:text,data:reply_to_id,data:retweet_to_id,data:user_id,data:tweet_id,data:hash_tag -Dimporttsv.separator=\t -Dimporttsv.bulk.output=/hfiles tweet2 /input/try2.csv
+
+    hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles /hfiles tweet2
+
+# Create a new directory in HDFS
+hadoop fs -mkdir /input
+# Put the dataset to HDFS
+hadoop fs -put try2.csv /input
+# To check if the file is successfully stored to HDFS, use the following command (or you may specify your own file path):
+hadoop fs -ls /input/try2.csv
+create 'tweet2', 'data', SPLITS=> ['20', '40','60','80']
+hbase shell
+scan 'tweet2', {'LIMIT' => 5}
+
+yarn jar /home/hadoop/import_tsv.jar edu.cmu.cc.utils.YetAnotherImportTsv
+
+#delete
+hadoop fs -rm -r /hfiles
+disable 'tweet2'
+drop 'tweet2'
+
+aws ecr get-login-password --no-verify-ssl | docker login --username AWS --password-stdin 856329486021.dkr.ecr.us-east-1.amazonaws.com
+docker buildx create --use --name multiarhbuilder
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-twitter:v006x --push .
+
+
+docker build -t activejtwitter .
+docker run -p 8080:8080 activejtwitter:latest
+
+docker pull 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-twitter:v006x
+docker run -p 80:8080 activej-twitter:v005x
+
+docker run -e ZK_ADDR='ip-172-31-21-210.ec2.internal' -p 8080:8080 -t 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-twitter:v007x

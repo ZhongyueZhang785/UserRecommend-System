@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: qr-web-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+
+spec:
+  defaultBackend:
+    service:
+      name: qr-web-service
+      port:
+        number: 80
+  rules:
+    - http:
+        paths:
+          - path: /qrcode
+            pathType: Prefix
+            backend:
+              service:
+                name: qr-web-service
+                port:
+                  number: 80

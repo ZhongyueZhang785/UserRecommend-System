@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: activej-qr-alb-config
+data:
+  # update MySQL environment variables for the profile service
+  MYSQL_DB_HOST: 'mysql-profile.default.svc.cluster.local'
+  MYSQL_DB_USER: 'QRwebzzy'
+  MYSQL_DB_PASSWORD: 'MDljMDYwYzczZjk3NTg5OWQ0MGRhMDM0'
+  MYSQL_DB_PORT: '3306'

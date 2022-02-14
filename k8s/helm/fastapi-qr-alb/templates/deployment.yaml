@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-qr-alb-deployment
+  labels:
+    app: fastapi-qr-alb
+
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: fastapi-qr-alb
+  template:
+    metadata:
+      labels:
+        app: fastapi-qr-alb
+    spec:
+      containers:
+        - name: fastapi-qr-alb-deployment
+          image: 856329486021.dkr.ecr.us-east-1.amazonaws.com/fastapi-qr:v002
+          ports:
+            - containerPort: 80
+          env:
+            # Define the environment variable
+            - name: MYSQL_DB_HOST # Notice that the case is different here
+              # from the key name in the ConfigMap.
+              valueFrom:
+                configMapKeyRef:
+                  name: fastapi-qr-alb-config           # The ConfigMap this value comes from.
+                  key: MYSQL_DB_HOST # The key to fetch.
+            - name: MYSQL_DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: fastapi-qr-alb-config
+                  key: MYSQL_DB_USER
+            - name: MYSQL_DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: fastapi-qr-alb-config
+                  key: MYSQL_DB_PASSWORD
+            - name: MYSQL_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: fastapi-qr-alb-config
+                  key: MYSQL_DB_PORT
+          resources:
+            requests:
+              cpu: 1000m
+            limits:
+              cpu: 2000m
+

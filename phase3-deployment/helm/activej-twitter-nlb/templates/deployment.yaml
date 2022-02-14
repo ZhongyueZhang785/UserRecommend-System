@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activej-twitter-nlb-deployment
+  labels:
+    app: activej-twitter-nlb
+
+spec:
+  replicas: 30
+  selector:
+    matchLabels:
+      app: activej-twitter-nlb
+  template:
+    metadata:
+      labels:
+        app: activej-twitter-nlb
+    spec:
+      containers:
+        - name: activej-twitter-nlb-deployment
+          image: 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-p4:v001x
+          ports:
+            - containerPort: 8080
+          env:
+            # Define the environment variable
+            - name: USER
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-twitter-nlb-config
+                  key: USER
+            - name: PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-twitter-nlb-config
+                  key: PASSWORD
+            - name: ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-twitter-nlb-config
+                  key: ADDRESS
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-twitter-nlb-config
+                  key: DB_NAME
+
+          resources:
+            requests:
+              cpu: 300m
+            limits:
+              cpu: 2000m
+

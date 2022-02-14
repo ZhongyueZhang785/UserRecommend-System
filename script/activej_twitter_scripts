@@ -1,0 +1,35 @@
+export USER=admin
+export PASSWORD=ccnn2021!
+export ADDRESS=twitter-aurora-final.cluster-cf6apywz25dq.us-east-1.rds.amazonaws.com
+export DB_NAME=twitter_aurora
+
+sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-ports 8080
+java -jar P5Application.jar
+
+#java -jar activejTwitter.jar
+lsof -i:8080
+kill ID
+
+#multiplatform push images
+https://blog.csdn.net/liumiaocn/article/details/109397297
+aws ecr get-login-password --no-verify-ssl | docker login --username AWS --password-stdin 856329486021.dkr.ecr.us-east-1.amazonaws.com
+docker buildx create --use --name multiarhbuilder
+
+
+docker pull 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-p5:v003x
+docker run 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-twitter:v001x
+
+
+docker build -t activej-tweet .
+docker run -p 8080:8080 activej-tweet:latest
+docker ps
+
+docker run -p 8080:8080 --env USER=admin --env PASSWORD=ccnn2021! --env ADDRESS=small-aurora-twitter-cluster.cluster-ro-cf6apywz25dq.us-east-1.rds.amazonaws.com --env DB_NAME=twitter_aurora 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-p5:v003x
+
+
+
+aws ecr get-login-password --no-verify-ssl | docker login --username AWS --password-stdin 856329486021.dkr.ecr.us-east-1.amazonaws.com
+docker buildx create --use --name multiarhbuilder
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-p5:v003x --push .
+
+856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-p3

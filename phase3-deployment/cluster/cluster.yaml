@@ -1,0 +1,30 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: eks-cluster
+  region: us-east-1
+  version: "1.21"
+  tags:
+    Project: twitter-phase-3
+availabilityZones:
+  - us-east-1a
+  - us-east-1b
+# eksctl will create a NAT gateway by default but we don't need it
+vpc:
+  nat:
+    gateway: Disable
+managedNodeGroups:
+  - name: ng-1
+    instanceType: c6g.large
+    desiredCapacity: 11
+    # The size of the root EBS volume for each node in the group
+    volumeSize: 15
+    minSize: 11
+    maxSize: 11
+    # For simplicity we will only host the nodes in one AZ, but in real deployments
+    # you want to have nodes across different AZs to achieve high availability
+    availabilityZones:
+      - us-east-1a
+    tags:
+      Project: twitter-phase-3

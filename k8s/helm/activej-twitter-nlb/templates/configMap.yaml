@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: activej-twitter-nlb-config
+data:
+  # update MySQL environment variables for the profile service
+  ZK_ADDR: ''

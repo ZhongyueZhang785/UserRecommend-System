@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qr-web-deployment
+  labels:
+    app: qr-web
+
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: qr-web
+  template:
+    metadata:
+      labels:
+        app: qr-web
+    spec:
+      containers:
+        - name: qr-web-deployment
+          image: 856329486021.dkr.ecr.us-east-1.amazonaws.com/phaseoneweb:v004 #waiting for change
+          ports:
+            - containerPort: 80
+          env:
+            # Define the environment variable
+            - name: MYSQL_DB_HOST # Notice that the case is different here
+              # from the key name in the ConfigMap.
+              valueFrom:
+                configMapKeyRef:
+                  name: qr-web-config           # The ConfigMap this value comes from.
+                  key: MYSQL_DB_HOST # The key to fetch.
+            - name: MYSQL_DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: qr-web-config
+                  key: MYSQL_DB_USER
+            - name: MYSQL_DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: qr-web-config
+                  key: MYSQL_DB_PASSWORD
+            - name: MYSQL_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: qr-web-config
+                  key: MYSQL_DB_PORT
+

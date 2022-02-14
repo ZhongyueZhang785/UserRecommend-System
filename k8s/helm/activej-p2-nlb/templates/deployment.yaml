@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activej-p2-nlb-deployment
+  labels:
+    app: activej-p2-nlb
+
+spec:
+  replicas: 40
+  selector:
+    matchLabels:
+      app: activej-p2-nlb
+  template:
+    metadata:
+      labels:
+        app: activej-p2-nlb
+    spec:
+      containers:
+        - name: activej-p2-nlb-deployment
+          image: 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-p2:v001x
+
+          ports:
+            - containerPort: 8080
+          env:
+            # Define the environment variable
+            - name: ZK_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-p2-nlb-config
+                  key: ZK_ADDR
+          resources:
+            requests:
+              cpu: 300m
+            limits:
+              cpu: 2000m
+

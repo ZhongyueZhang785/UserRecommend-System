@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: activej-p5-nlb-config
+data:
+  # update MySQL environment variables for the profile service
+  USER: 'admin'
+  PASSWORD: 'ccnn2021!'
+  ADDRESS: 'small-aurora-twitter-cluster.cluster-ro-cf6apywz25dq.us-east-1.rds.amazonaws.com'
+  DB_NAME: 'twitter_aurora'

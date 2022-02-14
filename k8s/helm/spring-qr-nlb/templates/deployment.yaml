@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-qr-nlb-deployment
+  labels:
+    app: spring-qr-nlb
+
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: spring-qr-nlb
+  template:
+    metadata:
+      labels:
+        app: spring-qr-nlb
+    spec:
+      containers:
+        - name: spring-qr-nlb-deployment
+          image: 856329486021.dkr.ecr.us-east-1.amazonaws.com/spring-qr:v001
+          ports:
+            - containerPort: 8080
+          env:
+            # Define the environment variable
+            - name: MYSQL_DB_HOST # Notice that the case is different here
+              # from the key name in the ConfigMap.
+              valueFrom:
+                configMapKeyRef:
+                  name: spring-qr-nlb-config           # The ConfigMap this value comes from.
+                  key: MYSQL_DB_HOST # The key to fetch.
+            - name: MYSQL_DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: spring-qr-nlb-config
+                  key: MYSQL_DB_USER
+            - name: MYSQL_DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: spring-qr-nlb-config
+                  key: MYSQL_DB_PASSWORD
+            - name: MYSQL_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: spring-qr-nlb-config
+                  key: MYSQL_DB_PORT
+          resources:
+            requests:
+              cpu: 1000m
+            limits:
+              cpu: 2000m
+

@@ -1,0 +1,37 @@
+cd D:\AZ\zzy\CMU\21Fall\CC\NoeatNosleep2021-F21\web\activej-qr
+mvn clean
+mvn package -DskipTests=true
+docker build -t activej-qr .
+docker run -p 80:8080 activej-qr:latest
+docker ps
+
+aws ecr describe-repositories --region us-east-1
+set-ExecutionPolicy RemoteSigned
+#windows
+msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi
+#linux
+sudo apt install awscli
+
+export HTTPS_PROXY=8080:8080
+
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 856329486021.dkr.ecr.us-east-1.amazonaws.com
+
+docker tag activej-qr 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-qr:v001
+docker push 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-qr:v001
+aws ecr get-login --no-include-email --no-verify-ssl
+
+#multiplatform push images
+https://blog.csdn.net/liumiaocn/article/details/109397297
+aws ecr get-login-password --no-verify-ssl | docker login --username AWS --password-stdin 856329486021.dkr.ecr.us-east-1.amazonaws.com
+docker buildx create --use --name multiarhbuilder
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-twitter:v001x --push .
+
+#install aws cli in linux
+curl "https://s3.amazonaws.com/aws-cli/awscli-bundle-1.20.58.zip" -o "awscli-bundle.zip"
+unzip awscli-bundle.zip
+sudo /usr/local/bin/python3.8 awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+sudo ln -s /usr/bin/python3.8 /usr/bin/python
+sudo apt install python3.8-venv
+
+sudo /usr/bin/python3.8 awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+sudo /bin/python3.6.9 awscli-bundle/install -i /aws -b /usr/local/bin/aws

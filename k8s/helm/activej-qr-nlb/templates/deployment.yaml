@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activej-qr-nlb-deployment
+  labels:
+    app: activej-qr-nlb
+
+spec:
+  replicas: 60
+  selector:
+    matchLabels:
+      app: activej-qr-nlb
+  template:
+    metadata:
+      labels:
+        app: activej-qr-nlb
+    spec:
+      containers:
+        - name: activej-qr-nlb-deployment
+          image: 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-qr:v002x
+          ports:
+            - containerPort: 8080
+          env:
+            # Define the environment variable
+            - name: MYSQL_DB_HOST # Notice that the case is different here
+              # from the key name in the ConfigMap.
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-qr-nlb-config           # The ConfigMap this value comes from.
+                  key: MYSQL_DB_HOST # The key to fetch.
+            - name: MYSQL_DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-qr-nlb-config
+                  key: MYSQL_DB_USER
+            - name: MYSQL_DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-qr-nlb-config
+                  key: MYSQL_DB_PASSWORD
+            - name: MYSQL_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-qr-nlb-config
+                  key: MYSQL_DB_PORT
+          resources:
+            requests:
+              cpu: 300m
+            limits:
+              cpu: 2000m
+

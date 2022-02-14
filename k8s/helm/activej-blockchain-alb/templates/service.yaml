@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: activej-blockchain-alb-service
+spec:
+  selector:
+    app: activej-blockchain-alb
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort

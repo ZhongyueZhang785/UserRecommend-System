@@ -1,0 +1,21 @@
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: cluster.k8s.local
+  name: master-us-east-1a
+spec:
+  # Base image for master node. Note that if machine type is changed to ARM-based types
+  # the image needs to be updated to ARM image:
+  # 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-20210720
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20210720
+  machineType: m5.large
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-us-east-1a
+  role: Master
+  rootVolumeSize: 32
+  rootVolumeType: gp2
+  subnets:
+  - us-east-1a

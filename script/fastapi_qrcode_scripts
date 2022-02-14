@@ -1,0 +1,48 @@
+conda env export > environment.yml
+uvicorn main:app --reload
+
+#download pip in vm
+sudo apt-get update && sudo apt-get install python3-pip
+python -m pip install --upgrade pip
+
+#if permission denied
+# https://blog.csdn.net/weixin_40992982/article/details/97771332
+sudo rm -rf /var/lib/dpkg/lock
+sudo rm -rf /var/cache/apt/archives/lock
+sudo apt-get update
+
+#update python
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt-get update
+sudo apt install python3.7
+
+#download packages
+pip3 install -r requirements.txt
+
+#download docker
+sudo apt  install docker.io
+
+#docker permission denied
+#https://blog.csdn.net/u011337602/article/details/104541261
+sudo groupadd docker # add docker to user group
+sudo gpasswd -a $USER docker
+newgrp docker #upgrade user group
+
+#build docker
+#https://fastapi.tiangolo.com/deployment/docker/
+docker build -t myimage .
+docker run -d -p 80:80 myimage:latest
+docker ps
+docker run  -p 80:80 myimage:latest
+
+#push docker
+#https://docs.aws.amazon.com/zh_cn/AmazonECR/latest/userguide/docker-push-ecr-image.html
+aws ecr describe-repositories --region us-east-1
+sudo apt install awscli
+
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 856329486021.dkr.ecr.us-east-1.amazonaws.com
+docker tag myimage 856329486021.dkr.ecr.us-east-1.amazonaws.com/phaseoneweb:v001
+docker push 856329486021.dkr.ecr.us-east-1.amazonaws.com/phaseoneweb:v001
+
+
+

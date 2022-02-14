@@ -1,0 +1,17 @@
+{
+  "address": "649 Penn Ave",
+  "business_id": "JLbgvGM4FXh9zNP4O5ZWjQ",
+  "city": "Pittsburgh",
+  "hashtags": "{'Monday': 1, 'Tuesday': 2, 'Friday': '17:00-0:00', 'Wednesday': '11:30-14:00', 'Thursday': '11:30-14:00', 'Sunday': '17:00-22:00', 'Saturday': '10:30-14:00'}",
+  "latitude": "40.44",
+  "longitude": "-80.00",
+  "name": "Meat & Potatoes",
+  "postal_code": "15222",
+  "review_count": 1476,
+  "stars": 4.0,
+  "state": "PA",
+  "attributes": "{'GoodForMeal': {'dessert': False, 'latenight': False, 'lunch': False, 'dinner': True, 'brunch': False, 'breakfast': False}, 'Alcohol': 'full_bar', 'Caters': False, 'HasTV': False, 'GoodForKids': False, 'NoiseLevel': 'average', 'WiFi': 'free', 'RestaurantsAttire': 'casual', 'RestaurantsReservations': True, 'OutdoorSeating': True, 'BusinessAcceptsCreditCards': True, 'RestaurantsPriceRange2': 3, 'BikeParking': True, 'RestaurantsTableService': True, 'RestaurantsDelivery': False, 'Ambience': {'romantic': False, 'intimate': False, 'classy': False, 'hipster': False, 'divey': False, 'touristy': False, 'trendy': True, 'upscale': False, 'casual': False}, 'RestaurantsTakeOut': True, 'RestaurantsGoodForGroups': True, 'WheelchairAccessible': True, 'BusinessParking': {'garage': True, 'street': True, 'validated': False, 'lot': False, 'valet': False}}",
+  "categories": "['Specialty Food', 'Steakhouses', 'Meat Shops', 'American (New)', 'Gastropubs', 'Restaurants', 'Food']",
+  "neighborhood": "Downtown",
+  "open": true
+}

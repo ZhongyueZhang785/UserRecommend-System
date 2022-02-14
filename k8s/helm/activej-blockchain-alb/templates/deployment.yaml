@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activej-blockchain-alb-deployment
+  labels:
+    app: activej-blockchain-alb
+
+spec:
+  replicas: 60
+  selector:
+    matchLabels:
+      app: activej-blockchain-alb
+  template:
+    metadata:
+      labels:
+        app: activej-blockchain-alb
+    spec:
+      containers:
+        - name: activej-blockchain-alb-deployment
+          image: 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-blockchain:v009x
+          ports:
+            - containerPort: 8080
+          env:
+            # Define the environment variable
+            - name: MYSQL_DB_HOST # Notice that the case is different here
+              # from the key name in the ConfigMap.
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-blockchain-alb-config           # The ConfigMap this value comes from.
+                  key: MYSQL_DB_HOST # The key to fetch.
+            - name: MYSQL_DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-blockchain-alb-config
+                  key: MYSQL_DB_USER
+            - name: MYSQL_DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-blockchain-alb-config
+                  key: MYSQL_DB_PASSWORD
+            - name: MYSQL_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-blockchain-alb-config
+                  key: MYSQL_DB_PORT
+          resources:
+            requests:
+              cpu: 400m
+            limits:
+              cpu: 1000m
+

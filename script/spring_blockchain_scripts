@@ -1,0 +1,9 @@
+mvn clean
+mvn package -DskipTests=true
+docker build -t spring-blockchain .
+docker run -p 80:8080 spring-blockchain:latest
+aws ecr describe-repositories --region us-east-1
+sudo apt install awscli
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 856329486021.dkr.ecr.us-east-1.amazonaws.com
+docker tag spring-blockchain 856329486021.dkr.ecr.us-east-1.amazonaws.com/spring-blockchain:v001
+docker push 856329486021.dkr.ecr.us-east-1.amazonaws.com/spring-blockchain:v001

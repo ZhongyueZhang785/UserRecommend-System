@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activej-p5-nlb-deployment
+  labels:
+    app: activej-p5-nlb
+
+spec:
+  replicas: 60
+  selector:
+    matchLabels:
+      app: activej-p5-nlb
+  template:
+    metadata:
+      labels:
+        app: activej-p5-nlb
+    spec:
+      containers:
+        - name: activej-p5-nlb-deployment
+          image: 856329486021.dkr.ecr.us-east-1.amazonaws.com/activej-p5:v003x
+          ports:
+            - containerPort: 8080
+          env:
+            # Define the environment variable
+            - name: USER
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-p5-nlb-config
+                  key: USER
+            - name: PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-p5-nlb-config
+                  key: PASSWORD
+            - name: ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-p5-nlb-config
+                  key: ADDRESS
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: activej-p5-nlb-config
+                  key: DB_NAME
+
+          resources:
+            requests:
+              cpu: 300m
+            limits:
+              cpu: 2000m
+
